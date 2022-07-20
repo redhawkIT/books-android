@@ -6,15 +6,24 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.books.R
+import com.example.books.models.Book
+import com.example.books.viewModels.AdapterBookList
 import com.example.books.viewModels.MainViewModel
 
-class MainActivity : BaseActivity() {
+interface OnBottomReachedListener
+{
+    fun onBottomReached()
+}
+
+class MainActivity : BaseActivity(), OnBottomReachedListener {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var rvBook: RecyclerView
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var adapter: AdapterBookList
 
     var startIndex = 0
+    var lBooks: List<Book> = ArrayList<Book>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +34,9 @@ class MainActivity : BaseActivity() {
         linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rvBook.layoutManager = linearLayoutManager
         mainViewModel = MainViewModel()
+        adapter = AdapterBookList(this)
+        rvBook.adapter = adapter
+        adapter.addBooks(null)
 
         loadBooks(startIndex)
     }
@@ -40,7 +52,13 @@ class MainActivity : BaseActivity() {
                 Toast.makeText(this, err, Toast.LENGTH_SHORT).show()
                 return@loadBooksByIndex
             }
-
+            lBooks = lBooks + listBook!!
+            adapter.addBooks(lBooks)
         }
+    }
+
+    override fun onBottomReached() {
+        startIndex++
+        loadBooks(startIndex)
     }
 }
