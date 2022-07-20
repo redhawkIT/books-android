@@ -6,11 +6,13 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.books.R
+import com.example.books.viewModels.MainViewModel
 
 class MainActivity : BaseActivity() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var rvBook: RecyclerView
+    private lateinit var mainViewModel: MainViewModel
 
     var startIndex = 0
 
@@ -22,11 +24,23 @@ class MainActivity : BaseActivity() {
 
         linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rvBook.layoutManager = linearLayoutManager
+        mainViewModel = MainViewModel()
 
         loadBooks(startIndex)
     }
 
     private fun loadBooks(index: Int) {
+        showProgressHUD()
 
+        mainViewModel.loadBooksByIndex(index) { err, listBook ->
+
+            hideProgressHUD()
+            if (err != null)
+            {
+                Toast.makeText(this, err, Toast.LENGTH_SHORT).show()
+                return@loadBooksByIndex
+            }
+
+        }
     }
 }
